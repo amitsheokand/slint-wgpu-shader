@@ -1,0 +1,236 @@
+export component WgpuShaderApp inherits Window {
+    title: "WGPU Shader Demo";
+    preferred-width: 1200px;
+    preferred-height: 900px;
+    
+    // Properties to hold shader textures
+    in-out property <image> rainbow-shader-texture;
+    in-out property <image> wave-shader-texture;
+    in-out property <image> noise-shader-texture;
+    in-out property <image> gradient-shader-texture;
+    
+    // Current viewer shader (0=rainbow, 1=wave, 2=noise, 3=gradient)
+    property <int> current-shader: 0;
+    property <int> click-count: 0;
+    
+    // Helper function to get current shader texture
+    function get-current-shader-texture() -> image {
+        if (current-shader == 0) { return rainbow-shader-texture; }
+        if (current-shader == 1) { return wave-shader-texture; }
+        if (current-shader == 2) { return noise-shader-texture; }
+        return gradient-shader-texture;
+    }
+    
+    function get-current-shader-name() -> string {
+        if (current-shader == 0) { return "Rainbow Shader"; }
+        if (current-shader == 1) { return "Wave Shader"; }
+        if (current-shader == 2) { return "Noise Shader"; }
+        return "Gradient Shader";
+    }
+    
+    VerticalLayout {
+        padding: 30px;
+        spacing: 30px;
+        
+        Text {
+            text: "WGPU Shader Demo";
+            font-size: 36px;
+            horizontal-alignment: center;
+        }
+        
+        // Large shader viewer
+        Rectangle {
+            height: 400px;
+            border-radius: 20px;
+            border-width: 4px;
+            border-color: #ffffff;
+            
+            Image {
+                source: root.get-current-shader-texture();
+                width: 100%;
+                height: 100%;
+            }
+            
+            // Overlay with shader name
+            Rectangle {
+                y: parent.height - 60px;
+                height: 60px;
+                background: #000000cc;
+                border-radius: 0px;
+                
+                Text {
+                    text: root.get-current-shader-name();
+                    color: white;
+                    font-size: 28px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+        }
+        
+        Text {
+            text: "Click count: " + click-count;
+            font-size: 18px;
+            horizontal-alignment: center;
+        }
+        
+        // Grid layout for shader selector buttons
+        GridLayout {
+            spacing: 20px;
+            padding: 20px;
+            
+            Row {
+                // Rainbow shader button
+                Rectangle {
+                    col: 0;
+                    width: 250px;
+                    height: 100px;
+                    border-radius: 50px;
+                    border-width: current-shader == 0 ? 5px : 3px;
+                    border-color: current-shader == 0 ? #ffff00 : #ffffff;
+                    
+                    Image {
+                        source: root.rainbow-shader-texture;
+                        width: 100%;
+                        height: 100%;
+                    }
+                    
+                    Text {
+                        text: "Rainbow";
+                        color: white;
+                        font-size: 18px;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                    
+                    TouchArea {
+                        clicked => {
+                            root.current-shader = 0;
+                            root.click-count += 1;
+                        }
+                    }
+                }
+                
+                // Wave shader button
+                Rectangle {
+                    col: 1;
+                    width: 250px;
+                    height: 100px;
+                    border-radius: 50px;
+                    border-width: current-shader == 1 ? 5px : 3px;
+                    border-color: current-shader == 1 ? #ffff00 : #ffffff;
+                    
+                    Image {
+                        source: root.wave-shader-texture;
+                        width: 100%;
+                        height: 100%;
+                    }
+                    
+                    Text {
+                        text: "Wave";
+                        color: white;
+                        font-size: 18px;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                    
+                    TouchArea {
+                        clicked => {
+                            root.current-shader = 1;
+                            root.click-count += 2;
+                        }
+                    }
+                }
+                
+                // Noise shader button
+                Rectangle {
+                    col: 2;
+                    width: 250px;
+                    height: 100px;
+                    border-radius: 50px;
+                    border-width: current-shader == 2 ? 5px : 3px;
+                    border-color: current-shader == 2 ? #ffff00 : #ffffff;
+                    
+                    Image {
+                        source: root.noise-shader-texture;
+                        width: 100%;
+                        height: 100%;
+                    }
+                    
+                    Text {
+                        text: "Noise";
+                        color: white;
+                        font-size: 18px;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                    
+                    TouchArea {
+                        clicked => {
+                            root.current-shader = 2;
+                            root.click-count += 3;
+                        }
+                    }
+                }
+                
+                // Gradient shader button
+                Rectangle {
+                    col: 3;
+                    width: 250px;
+                    height: 100px;
+                    border-radius: 50px;
+                    border-width: current-shader == 3 ? 5px : 3px;
+                    border-color: current-shader == 3 ? #ffff00 : #ffffff;
+                    
+                    Image {
+                        source: root.gradient-shader-texture;
+                        width: 100%;
+                        height: 100%;
+                    }
+                    
+                    Text {
+                        text: "Gradient";
+                        color: white;
+                        font-size: 18px;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                    
+                    TouchArea {
+                        clicked => {
+                            root.current-shader = 3;
+                            root.click-count += 4;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Information section
+        Rectangle {
+            height: 80px;
+            background: #545454;
+            border-radius: 15px;
+            border-width: 2px;
+            border-color: #cccccc;
+            
+            VerticalLayout {
+                padding: 15px;
+                spacing: 5px;
+                alignment: center;
+                
+                Text {
+                    text: "Click any shader button to view it in the large display above";
+                    font-size: 16px;
+                    horizontal-alignment: center;
+                }
+                
+                Text {
+                    text: "Real GPU Shaders • 60 FPS Animation • WGPU 26.0 • Time Uniforms";
+                    font-size: 14px;
+                    horizontal-alignment: center;
+                }
+            }
+        }
+    }
+} 

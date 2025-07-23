@@ -1,0 +1,13 @@
+[package]
+name = "slint-shader"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+slint = { version = "~1.12", features = ["unstable-wgpu-24"] }
+wgpu = "26.0"
+bytemuck = { version = "1.0", features = ["derive"] }
+pollster = "0.3"
+
+[build-dependencies]
+slint-build = "1.4"
