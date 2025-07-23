@@ -23,5 +23,5 @@ slint-shader/
 2. **Clone/Setup**: Navigate to project directory
 3. **Run**: 
    ```bash
-   cargo run
+   cargo run --release
    ```

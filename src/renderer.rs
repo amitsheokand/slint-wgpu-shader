@@ -17,6 +17,8 @@ pub struct ShaderRenderer {
     texture: wgpu::Texture,
     texture_view: wgpu::TextureView,
     start_time: Instant,
+    frozen_time: Option<f32>,
+    total_paused_duration: f32,
 }
 
 impl ShaderRenderer {
@@ -115,14 +117,32 @@ impl ShaderRenderer {
             texture,
             texture_view,
             start_time: Instant::now(),
+            frozen_time: None,
+            total_paused_duration: 0.0,
         }
     }
 
-    pub fn render(&mut self) -> wgpu::Texture {
-        // Update time uniform
-        let elapsed = self.start_time.elapsed().as_secs_f32();
+    pub fn render(&mut self, animation_enabled: bool) -> wgpu::Texture {
+        // Update time uniform - freeze time if animation is disabled
+        let current_time = if animation_enabled {
+            // If we were frozen, unfreeze and resume
+            if let Some(frozen) = self.frozen_time.take() {
+                // Resume from the frozen time
+                self.total_paused_duration = self.start_time.elapsed().as_secs_f32() - frozen;
+            }
+            self.start_time.elapsed().as_secs_f32() - self.total_paused_duration
+        } else {
+            // If not frozen yet, freeze at current time
+            if self.frozen_time.is_none() {
+                let current = self.start_time.elapsed().as_secs_f32() - self.total_paused_duration;
+                self.frozen_time = Some(current);
+            }
+            // Return the frozen time
+            self.frozen_time.unwrap()
+        };
+
         let time_uniform = TimeUniform {
-            time: elapsed,
+            time: current_time,
             _padding: [0.0; 3],
         };
 
@@ -179,8 +199,13 @@ impl AnimatedShaderManager {
 
     pub fn update_and_render(
         &mut self,
+        animation_enabled: bool,
     ) -> (slint::Image, slint::Image, slint::Image, slint::Image) {
-        let textures: Vec<_> = self.renderers.iter_mut().map(|r| r.render()).collect();
+        let textures: Vec<_> = self
+            .renderers
+            .iter_mut()
+            .map(|r| r.render(animation_enabled))
+            .collect();
 
         (
             slint::Image::try_from(textures[0].clone()).unwrap(),
@@ -196,5 +221,5 @@ pub fn setup_shader_textures(
     queue: &wgpu::Queue,
 ) -> (slint::Image, slint::Image, slint::Image, slint::Image) {
     let mut manager = pollster::block_on(AnimatedShaderManager::new(device, queue));
-    manager.update_and_render()
+    manager.update_and_render(true) // Start with animation enabled
 }

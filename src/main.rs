@@ -36,7 +36,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // Initial render
             if let Some(ref mut manager) = shader_manager_clone.borrow_mut().as_mut() {
                 let (rainbow_image, wave_image, noise_image, gradient_image) =
-                    manager.update_and_render();
+                    manager.update_and_render(app.get_animation_enabled());
 
                 app.set_rainbow_shader_texture(rainbow_image);
                 app.set_wave_shader_texture(wave_image);
@@ -58,8 +58,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 app_weak_timer.upgrade(),
                 shader_manager_timer.borrow_mut().as_mut(),
             ) {
+                // Always render, but pass animation state to control time progression
+                let animation_enabled = app.get_animation_enabled();
                 let (rainbow_image, wave_image, noise_image, gradient_image) =
-                    manager.update_and_render();
+                    manager.update_and_render(animation_enabled);
 
                 app.set_rainbow_shader_texture(rainbow_image);
                 app.set_wave_shader_texture(wave_image);
